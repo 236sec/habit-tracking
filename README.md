@@ -4,26 +4,27 @@ A planned, phone-first web application for individuals to keep good habits going
 
 ## Project status
 
-Planning is complete and the application scaffolds are in place. Product features, including Supabase sign-in, have not been implemented yet.
+The first slice provides Google and GitHub sign-in through Supabase Auth and a protected, empty Today screen. Habit, routine, Task, and Subscription features remain to be built. Live provider verification awaits configured test projects.
 
 ## Local development
 
-Requirements: Rust 1.97+, Node.js 20.9+, npm, Docker, and Make.
+Requirements: Rust 1.97+, Node.js 20.9+, npm, Make, and access to PostgreSQL. Docker is optional.
+
+Configure the two Supabase Auth projects and environment files as described in [social sign-in setup](docs/auth-setup.md).
 
 ```bash
 cd frontend && npm ci && npm run dev
 ```
 
-In another terminal, start the database and backend:
+In another terminal, configure a PostgreSQL connection and start the backend:
 
 ```bash
 cd backend
-docker compose up -d database
 cp .env.example .env
 cargo run
 ```
 
-The frontend runs at `http://localhost:3000` and the backend health endpoint is `http://localhost:8000/api/health`. Run `make check` at the repository root for Rust formatting/Clippy and frontend Prettier/ESLint/TypeScript checks. Run `make format` to apply formatting and `make test` for Rust tests. The tracked `.githooks/pre-commit` runs `make check`; activate it in a clone with `git config core.hooksPath .githooks` (already configured in this checkout). No GitHub Actions workflow is used.
+Set `DATABASE_URL` in `backend/.env` to your PostgreSQL connection before `cargo run`; migrations apply on startup. The frontend runs at `http://localhost:3000` and the backend health endpoint is `http://localhost:8000/api/health`. Run `make check` at the repository root for Rust formatting/Clippy and frontend Prettier/ESLint/TypeScript checks. Run `make format` to apply formatting and `make test` for Rust tests. The backend HTTP tests run without Docker; the PostgreSQL persistence test is opt-in as documented in [social sign-in setup](docs/auth-setup.md). The tracked `.githooks/pre-commit` runs `make check`; activate it in a clone with `git config core.hooksPath .githooks` (already configured in this checkout). No GitHub Actions workflow is used.
 
 The backend is derived from [236sec/rust-axum-boilerplate](https://github.com/236sec/rust-axum-boilerplate); see [backend/README.md](backend/README.md) for the source commit and changes.
 

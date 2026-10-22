@@ -4,9 +4,9 @@ Axum starter derived from [236sec/rust-axum-boilerplate](https://github.com/236s
 
 ## Run locally
 
-1. Start Postgres: `docker compose up -d database`
-2. Copy `.env.example` to `.env`.
-3. Run `cargo run`.
+1. Provide a PostgreSQL connection URL (local or hosted).
+2. Copy `.env.example` to `.env` and set `DATABASE_URL` and both Supabase project URLs.
+3. Run `cargo run`; migrations apply on startup.
 4. Check `http://localhost:8000/api/health`.
 
-Use `cargo fmt --all -- --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test` for local checks. Add SQLx migrations as product features are implemented. The database has no application tables yet.
+Use `cargo fmt --all -- --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test` for local checks. The HTTP auth tests run without PostgreSQL. The account persistence test is opt-in and needs `TEST_DATABASE_URL`; see [social sign-in setup](../docs/auth-setup.md). The `accounts` and `account_identities` tables are created by the first migration.
