@@ -31,8 +31,7 @@ export default async function Today() {
             </span>
             <p className="text-xs text-stone-500">
               Signed in with{" "}
-              {session.provider === "google" ? "Google" : "GitHub"} · Account{" "}
-              {me.data.id.slice(0, 8)}
+              {session.provider === "google" ? "Google" : "GitHub"}
             </p>
           </div>
           <form action="/auth/sign-out" method="post">
