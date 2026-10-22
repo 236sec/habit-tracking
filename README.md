@@ -4,7 +4,28 @@ A planned, phone-first web application for individuals to keep good habits going
 
 ## Project status
 
-Planning is complete; application implementation has not started. The repository currently contains product language and decisions, with no app code, build command, or test suite yet.
+Planning is complete and the application scaffolds are in place. Product features, including Supabase sign-in, have not been implemented yet.
+
+## Local development
+
+Requirements: Rust 1.97+, Node.js 20.9+, npm, Docker, and Make.
+
+```bash
+cd frontend && npm ci && npm run dev
+```
+
+In another terminal, start the database and backend:
+
+```bash
+cd backend
+docker compose up -d database
+cp .env.example .env
+cargo run
+```
+
+The frontend runs at `http://localhost:3000` and the backend health endpoint is `http://localhost:8000/api/health`. Run `make check` at the repository root for Rust formatting/Clippy and frontend Prettier/ESLint/TypeScript checks. Run `make format` to apply formatting and `make test` for Rust tests. The tracked `.githooks/pre-commit` runs `make check`; activate it in a clone with `git config core.hooksPath .githooks` (already configured in this checkout). No GitHub Actions workflow is used.
+
+The backend is derived from [236sec/rust-axum-boilerplate](https://github.com/236sec/rust-axum-boilerplate); see [backend/README.md](backend/README.md) for the source commit and changes.
 
 ## Source of truth
 
