@@ -31,6 +31,7 @@ async fn me_rejects_requests_without_a_verified_bearer_token() {
         .await
         .unwrap();
     assert_eq!(missing.status(), reqwest::StatusCode::UNAUTHORIZED);
+    assert_eq!(missing.headers()["cache-control"], "private, no-store");
 
     let forged = client
         .get(format!("http://{address}/api/me"))
@@ -42,11 +43,92 @@ async fn me_rejects_requests_without_a_verified_bearer_token() {
 }
 
 #[tokio::test]
-async fn same_email_in_distinct_verified_issuers_keeps_separate_accounts() {
-    let Ok(database_url) = std::env::var("TEST_DATABASE_URL") else {
-        eprintln!("Set TEST_DATABASE_URL to run the persistent account separation journey");
-        return;
+async fn me_accepts_only_signed_tokens_with_the_expected_issuer_audience_and_expiry() {
+    let jwks = json!({ "keys": [{
+        "kty": "RSA", "use": "sig", "alg": "RS256", "kid": "test-key", "e": "AQAB",
+        "n": "s82ZAWaHSUDNt7uY4vhv3x8HwQeDFB1pVNPs38fTLD9vrwipg6RtFknp3otGsu1qF7_zr7_lkqvMa-uC1kGpy2Nd4I1Y_HV5hh2g03Pr18LMuUpUszwysdkDxxEqaHiYCFQ7Y_YBL0FpLBZ4sJPKBWmzds-i0QxdAbMT6Uv7m-MHPkPmaBmXmZWI8fkdUfQ_XvQcUhoTEsd1sd-PsuISKltK7w959bAF4DLcBpHKqPXbZqifT5mD2eHwEMzNgSfntNgcJGlH0SGcABs-flZjCskwvrsh6IJPhrBIJ0rZdhk0wtAhvgpJaOdUK1FAQ1kfrdP8nIE9jM8nGFyBM0yqTQ"
+    }] });
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let issuer = format!("http://{}/auth/v1", listener.local_addr().unwrap());
+    let jwks_router = axum::Router::new().route(
+        "/auth/v1/.well-known/jwks.json",
+        axum::routing::get(move || {
+            let keys = jwks.clone();
+            async move { axum::Json(keys) }
+        }),
+    );
+    tokio::spawn(async move { axum::serve(listener, jwks_router).await.unwrap() });
+    let pool = PgPoolOptions::new()
+        .acquire_timeout(std::time::Duration::from_millis(500))
+        .connect_lazy("postgres://127.0.0.1:1/unused")
+        .unwrap();
+    let state = AppState {
+        config: Arc::new(AppConfig {
+            database_url: "postgres://127.0.0.1:1/unused".to_owned(),
+            bind_addr: "127.0.0.1:0".to_owned(),
+            auth_issuers: [issuer.clone(), "http://127.0.0.1:2/auth/v1".to_owned()],
+        }),
+        pool,
     };
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let address = listener.local_addr().unwrap();
+    tokio::spawn(async move { axum::serve(listener, create_app(state)).await.unwrap() });
+
+    let key =
+        jsonwebtoken::EncodingKey::from_rsa_pem(include_bytes!("fixtures/auth-test.pem")).unwrap();
+    let mut header = jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256);
+    header.kid = Some("test-key".to_owned());
+    let client = reqwest::Client::new();
+    for (claim_issuer, audience, expiry, expected_status) in [
+        (
+            issuer.as_str(),
+            "authenticated",
+            chrono::Utc::now().timestamp() + 3600,
+            reqwest::StatusCode::SERVICE_UNAVAILABLE,
+        ),
+        (
+            "http://untrusted.example/auth/v1",
+            "authenticated",
+            chrono::Utc::now().timestamp() + 3600,
+            reqwest::StatusCode::UNAUTHORIZED,
+        ),
+        (
+            issuer.as_str(),
+            "other",
+            chrono::Utc::now().timestamp() + 3600,
+            reqwest::StatusCode::UNAUTHORIZED,
+        ),
+        (
+            issuer.as_str(),
+            "authenticated",
+            chrono::Utc::now().timestamp() - 3600,
+            reqwest::StatusCode::UNAUTHORIZED,
+        ),
+    ] {
+        let token = jsonwebtoken::encode(
+            &header,
+            &json!({
+                "iss": claim_issuer, "sub": "test-subject", "aud": audience,
+                "role": "authenticated", "exp": expiry
+            }),
+            &key,
+        )
+        .unwrap();
+        let response = client
+            .get(format!("http://{address}/api/me"))
+            .bearer_auth(token)
+            .send()
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected_status);
+        assert_eq!(response.headers()["cache-control"], "private, no-store");
+    }
+}
+
+#[tokio::test]
+#[ignore = "requires TEST_DATABASE_URL"]
+async fn same_email_in_distinct_verified_issuers_keeps_separate_accounts() {
+    let database_url = std::env::var("TEST_DATABASE_URL").expect("TEST_DATABASE_URL must be set");
     let pool = PgPoolOptions::new().connect(&database_url).await.unwrap();
     sqlx::migrate!("./migrations").run(&pool).await.unwrap();
 
@@ -113,6 +195,7 @@ async fn same_email_in_distinct_verified_issuers_keeps_separate_accounts() {
                 .await
                 .unwrap();
             assert_eq!(response.status(), reqwest::StatusCode::OK);
+            assert_eq!(response.headers()["cache-control"], "private, no-store");
             response.json::<serde_json::Value>().await.unwrap()["data"]["id"]
                 .as_str()
                 .unwrap()

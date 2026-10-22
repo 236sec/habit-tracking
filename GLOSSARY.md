@@ -4,6 +4,12 @@ Language for an individual's habits and daily focus.
 
 ## Language
 
+**Account**:
+The individual's app data boundary, identified by a stable app UUID. An account can have more than one authenticated identity only after explicit linking.
+
+**Auth identity**:
+A verified issuer and subject pair from a supported sign-in provider. It maps to one Account. An email address alone is never an Auth identity or an Account key.
+
 **Habit**:
 A recurring behavior an individual plans for every day or selected weekdays. Its progress is judged against those planned days.
 _Avoid_: Task
