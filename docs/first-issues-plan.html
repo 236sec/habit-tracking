@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Habit Tracking · First Issues Implementation Plan</title>
+    <style>
+      :root { color-scheme: light; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f2; color: #17221d; }
+      * { box-sizing: border-box; }
+      body { margin: 0; line-height: 1.5; }
+      a { color: #146b55; }
+      .wrap { width: min(1100px, calc(100% - 36px)); margin: auto; }
+      header { background: #173e33; color: #fff; padding: 48px 0 42px; }
+      header a { color: #b9ebd9; }
+      .eyebrow { color: #6df0bf; font-size: .78rem; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+      h1 { margin: 10px 0 12px; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.12; }
+      h2 { margin: 0 0 16px; font-size: 1.4rem; }
+      h3 { margin: 0 0 10px; font-size: 1.1rem; }
+      p { margin: 0 0 12px; }
+      header p { max-width: 740px; color: #e1eee8; }
+      main { padding: 30px 0 64px; }
+      section { margin-top: 30px; }
+      .meta, .grid { display: grid; gap: 14px; }
+      .meta { grid-template-columns: repeat(3, 1fr); margin-top: 28px; }
+      .meta div { border: 1px solid #4d7668; border-radius: 12px; padding: 13px 15px; }
+      .meta strong { display: block; font-size: .8rem; color: #ace0cc; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card { background: #fff; border: 1px solid #dce5dd; border-radius: 16px; padding: 22px; box-shadow: 0 3px 12px #183c2509; }
+      .card.primary { border: 2px solid #28856d; }
+      .tag { display: inline-block; border-radius: 999px; background: #e5f3ec; color: #145a45; padding: 3px 9px; font-size: .75rem; font-weight: 750; margin-bottom: 12px; }
+      .tag.wait { background: #fff0d8; color: #805513; }
+      ul, ol { padding-left: 1.4rem; margin: 9px 0 0; }
+      li + li { margin-top: 7px; }
+      .flow { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+      .flow span, .flow a { background: #fff; border: 1px solid #cedfd4; border-radius: 9px; padding: 9px 12px; text-decoration: none; font-weight: 700; }
+      .flow b { color: #417a61; }
+      table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; }
+      th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid #e5ebe6; }
+      th { background: #eaf2ec; }
+      tr:last-child td { border-bottom: 0; }
+      .note { border-left: 4px solid #d89a32; background: #fff9eb; padding: 14px 17px; border-radius: 0 10px 10px 0; }
+      .small { font-size: .89rem; color: #526258; }
+      footer { margin-top: 35px; font-size: .87rem; color: #526258; }
+      @media (max-width: 720px) { .meta, .grid { grid-template-columns: 1fr; } header { padding: 34px 0; } .card { padding: 18px; } table { display: block; overflow-x: auto; } }
+      @media print { :root { background: #fff; } header { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .card { box-shadow: none; break-inside: avoid; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <div class="eyebrow">Implementation status · 22 October 2026</div>
+        <h1>First issues implementation plan</h1>
+        <p>A proposed first pass through <a href="https://github.com/236sec/habit-tracking/issues/1">product spec #1</a>. The initial milestone is a secure, bilingual Today screen with a real Habit check-in path.</p>
+        <div class="meta">
+          <div><strong>Manual check pending</strong><a href="https://github.com/236sec/habit-tracking/issues/2">#2 Sign in and open Today</a></div>
+          <div><strong>Next gate</strong><a href="https://github.com/236sec/habit-tracking/issues/3">#3 Thai and English Today</a></div>
+          <div><strong>First Habit slice</strong><a href="https://github.com/236sec/habit-tracking/issues/4">#4 Create and check in a Habit</a></div>
+        </div>
+      </div>
+    </header>
+    <main class="wrap">
+      <section aria-labelledby="sequence">
+        <h2 id="sequence">Dependency sequence</h2>
+        <div class="flow" aria-label="Ticket dependency path">
+          <a href="https://github.com/236sec/habit-tracking/issues/2">#2 Auth + Today</a><b>→</b>
+          <a href="https://github.com/236sec/habit-tracking/issues/3">#3 Language</a><b>→</b>
+          <a href="https://github.com/236sec/habit-tracking/issues/4">#4 Habit check-in</a>
+        </div>
+        <p class="small" style="margin-top: 12px">Native GitHub blockers also open <a href="https://github.com/236sec/habit-tracking/issues/16">#16 provider linking</a> after #2, and <a href="https://github.com/236sec/habit-tracking/issues/8">#8 Morning routine</a> plus <a href="https://github.com/236sec/habit-tracking/issues/11">#11 Tasks</a> after #3. Those can run alongside the Habit path in separate worktrees.</p>
+      </section>
+
+      <section aria-labelledby="work">
+        <h2 id="work">First three tickets</h2>
+        <div class="grid">
+          <article class="card primary">
+            <span class="tag">Implemented · manual check pending</span>
+            <h3><a href="https://github.com/236sec/habit-tracking/issues/2">#2 · Sign in and open Today</a></h3>
+            <p>Google and GitHub sign-in, account mapping, and protected Today are implemented on <a href="https://github.com/236sec/habit-tracking/pull/21">draft PR #21</a>. The two-project account-separation design remains provisional until the owner completes the live provider check.</p>
+            <ul>
+              <li>Add session handling in Next.js and server-side token verification in Axum for protected API requests.</li>
+              <li>Store user-owned records under a stable account identifier; reject access to another account's data. Verify that same-email providers do not merge app data without explicit linking.</li>
+              <li>Provide Google and GitHub sign-in, sign-out, return-session handling, and empty Today states for both phone and desktop.</li>
+              <li>Manually check both providers, sign-out and return, account separation, and OAuth redirects using <a href="auth-setup.md">the provider checklist</a>.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="tag wait">After #2</span>
+            <h3><a href="https://github.com/236sec/habit-tracking/issues/3">#3 · Switch Today between Thai and English</a></h3>
+            <p>Choose the initial language from the browser, then let a signed-in user override it across sessions and devices.</p>
+            <ul>
+              <li>Add one shared message and formatting layer for Today; make Thai and English the supported choices.</li>
+              <li>Persist the manual choice on the account. Apply it only to interface strings and displayed date/number formatting. Save user-entered text exactly as submitted and read or search that stored text directly, with no translation or locale-specific copy.</li>
+              <li>Manually check Thai and English preferences, an explicit switch, and a fresh session on another device context. Recheck user-entered Habit names when #4 adds that input.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="tag wait">After #3</span>
+            <h3><a href="https://github.com/236sec/habit-tracking/issues/4">#4 · Create and check in a Habit</a></h3>
+            <p>Give the user the first complete Habit journey: create, schedule, see it on Today, and check in once for a Planned day.</p>
+            <ul>
+              <li>Store Habit ownership, creation date, daily or selected-weekday schedule, and binary check-ins with a unique Habit/day constraint.</li>
+              <li>Calculate Planned days from the user's local calendar date; validate the day on the server before accepting a check-in.</li>
+              <li>Show Planned habits on Today and expose creation and check-in controls in Thai and English.</li>
+              <li>Cover selected weekdays, an unplanned-day rejection, and a second signed-in browser seeing the persisted check-in.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="tag">Shared delivery rule</span>
+            <h3>One vertical slice per issue</h3>
+            <p>Each issue includes schema, API, and UI where needed. Automate backend behavior and persistence checks at the HTTP/API boundary with controlled account and local-date inputs. The owner checks frontend journeys manually; do not add a frontend test runner.</p>
+            <p>Use the repository's <a href="../GLOSSARY.md">domain language</a>, preserve the historical Planned-day rule from <a href="../docs/adr/0001-preserve-historical-planned-days.md">ADR 0001</a>, and use Supabase Auth as recorded in <a href="../docs/adr/0002-use-supabase-social-auth.md">ADR 0002</a>.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="delivery">
+        <h2 id="delivery">Execution once the plan is accepted</h2>
+        <table>
+          <thead><tr><th>Stage</th><th>Action</th><th>Exit check</th></tr></thead>
+          <tbody>
+            <tr><td>Baseline</td><td>The integration branch <code>feat/issue-2-integration</code> starts from scaffold commit <code>95c904b</code>; #2 is claimed and implemented in draft PR #21.</td><td>Live provider verification is recorded on #2 before closure.</td></tr>
+            <tr><td>Ticket loop</td><td>Implement backend behavior test-first on each ticket branch and worktree, then merge into the integration branch.</td><td><code>make check</code>, backend tests, frontend build, and the ticket's manual UI checklist pass.</td></tr>
+            <tr><td>Frontier</td><td>After #2, start #3 and #16. After #3, start #4, #8, and #11 in parallel where capacity permits.</td><td>Only issues with closed blockers are claimed.</td></tr>
+            <tr><td>Review</td><td>Review the full integration branch against the spec and repo standards, resolve findings, then close tickets with evidence and context pointers.</td><td>All 17 tickets and the spec have been addressed before final branch handoff.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section aria-labelledby="review">
+        <h2 id="review">Review points</h2>
+        <div class="note">
+          <p><strong>Branch baseline:</strong> The scaffold is on <code>chore/bootstrap-app</code> and in <code>docs/product-foundation</code> through PR #20. The #2 integration branch and draft PR #21 build on that scaffold.</p>
+          <p><strong>External setup:</strong> Live journeys need two configured Supabase projects, Google and GitHub OAuth credentials, and authorized redirects. The owner will run the <a href="auth-setup.md">manual provider checklist</a>.</p>
+          <p><strong>Identity conflict:</strong> Supabase documents automatic same-email linking within one project. <a href="adr/0003-separate-provider-auth-projects.md">ADR 0003</a> provisionally separates the providers into two projects; verify this design before closing #2.</p>
+          <p style="margin-bottom: 0"><strong>Scope:</strong> #2 code is implemented. The remaining tickets and live provider verification are pending.</p>
+        </div>
+      </section>
+      <section aria-labelledby="technical">
+        <h2 id="technical">Technical plan</h2>
+        <div class="grid">
+          <article class="card">
+            <span class="tag">System boundary</span>
+            <h3>Request path</h3>
+            <p><strong>Browser → Next.js 16 → Axum 0.8 → PostgreSQL 16.</strong> Supabase Auth owns OAuth and sessions. The Next.js app renders Today and handles the OAuth callback. Axum owns account preferences, Habits, Planned-day decisions, and check-ins; SQLx owns migrations and queries.</p>
+            <p>Use provider-specific <code>@supabase/ssr</code> server clients with a PKCE callback. A Next.js <code>proxy.ts</code> refreshes cookies. Protected server views verify the session, and Axum validates the bearer token's signature, issuer, audience, and expiry before deriving the Account identity. Never authorize from an unverified cookie or a client-supplied Account ID.</p>
+            <p class="small">Exact file seams: <code>frontend/src/lib/supabase/</code>, <code>frontend/src/proxy.ts</code>, <code>frontend/src/app/auth/callback/route.ts</code>, <code>backend/src/handlers/</code>, <code>backend/src/usecases/</code>, <code>backend/src/repositories/</code>, and <code>backend/migrations/</code>.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Gate before #2</span>
+            <h3>Identity separation experiment</h3>
+            <p>In disposable Google-only and GitHub-only Supabase projects, sign in with the <em>same verified email</em>. Inspect the resulting issuers, subjects, and Account UUIDs without recording tokens. Confirm distinct Accounts and stable return sessions. Cross-project explicit linking belongs to #16 and requires proof of control of both sessions.</p>
+            <p>Acceptance: same-email sign-ins expose separate app data until an explicit link. If the configured projects or verified JWT claims do not support the issuer-and-subject mapping, revisit ADR 0003 and #16 before closing #2.</p>
+            <p class="small">This is a real spec/provider conflict, not a completed design choice. Supabase's current <a href="https://supabase.com/docs/guides/auth/auth-identity-linking">identity-linking documentation</a> describes the automatic same-email behavior.</p>
+          </article>
+        </div>
+      </section>
+      <section aria-labelledby="technical-details">
+        <h2 id="technical-details">Concrete slices and interfaces</h2>
+        <table>
+          <thead><tr><th>Issue</th><th>Data and API</th><th>Manual UI review</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/236sec/habit-tracking/issues/2">#2</a></td><td>An <code>accounts</code> table stores a stable UUID mapped from a verified issuer and subject. <code>GET /api/me</code> returns the current Account. Future data queries scope by Account; foreign IDs return 404. Store no provider secrets in the app database.</td><td>Manually check sign-in, callback, protected Today, sign-out, and responsive empty states with both providers at phone and desktop widths. Record the provider result on #2.</td></tr>
+            <tr><td><a href="https://github.com/236sec/habit-tracking/issues/3">#3</a></td><td>Add nullable <code>accounts.preferred_locale</code> constrained to <code>th</code>/<code>en</code>. Null means follow the browser preference; an explicit choice persists with <code>PATCH /api/me/preferences</code>. Centralize UI message keys and <code>Intl</code> date/number formatting. Locale never changes stored user content or its query path.</td><td>Manually check Thai and English defaults, switching, and a new session; #4 checks unchanged user-entered names.</td></tr>
+            <tr><td><a href="https://github.com/236sec/habit-tracking/issues/4">#4</a></td><td>Add <code>habits</code>, versioned <code>habit_schedules</code> (effective local day plus weekday mask), and <code>habit_check_ins</code> with a unique <code>(habit_id, local_day)</code> key. Store Habit names verbatim and query the stored names directly in either UI language. Expose <code>POST /api/habits</code>, <code>GET /api/today</code>, and idempotent <code>PUT /api/habits/:id/check-ins/:day</code>. The server verifies ownership and the Planned day before writing.</td><td>Manually create daily and selected-weekday Habits, cross a local-date boundary, reject an unplanned day, and confirm a check-in in a second signed-in browser. Verify a user-entered name stays identical across a language switch.</td></tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top: 10px">The initial schedule version in #4 prepares for <a href="https://github.com/236sec/habit-tracking/issues/5">#5</a>: edits add a new effective version, leaving earlier Planned days and check-ins intact. Keep the Habit/day uniqueness constraint in PostgreSQL so retries cannot double-check-in.</p>
+      </section>
+      <section aria-labelledby="runtime">
+        <h2 id="runtime">Time, security, and test setup</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Local day contract</h3>
+            <p>The browser supplies its current IANA time zone, such as <code>Asia/Bangkok</code>. Axum validates that identifier and derives today's local date from its clock for Today and today's check-in. Store calendar days as SQL <code>DATE</code>, not midnight UTC timestamps. A later trip changes the current time zone without rewriting past Planned days. The server owns the final Planned-day check.</p>
+          </article>
+          <article class="card">
+            <h3>Acceptance seams</h3>
+            <p>Automate backend HTTP/API behavior with controlled accounts, local dates, and database state where persistence matters. Use an existing test PostgreSQL URL for database tests; the test runner does not start Docker. The owner manually checks frontend journeys and live Google/GitHub redirects with configured provider projects.</p>
+          </article>
+          <article class="card">
+            <h3>Configuration</h3>
+            <p>Document each provider's <code>NEXT_PUBLIC_*_SUPABASE_URL</code> and publishable key, an internal Axum base URL, and backend Supabase project URLs. Keep OAuth client secrets, service keys, and live tokens out of Git. Configure authorized callback URLs for local and test environments.</p>
+          </article>
+          <article class="card">
+            <h3>Completion checks</h3>
+            <p>For each ticket: migration applies cleanly, backend ownership and invalid-date checks pass, <code>make check</code>, backend tests, and the frontend build pass, and the owner records the manual UI result. Review private caching around token refresh and keep protected data out of shared page caches.</p>
+          </article>
+        </div>
+      </section>
+      <section aria-labelledby="references">
+        <h2 id="references">Technical references</h2>
+        <p class="small"><a href="https://supabase.com/docs/guides/auth/server-side/creating-a-client">Supabase SSR client and verified claims</a> · <a href="https://supabase.com/docs/guides/auth/auth-identity-linking">Supabase identity linking</a> · <a href="https://supabase.com/docs/guides/auth/jwt-fields">Supabase JWT claims</a> · <a href="https://supabase.com/docs/guides/local-development">Supabase local development</a> · installed Next.js 16 guidance at <code>frontend/node_modules/next/dist/docs/01-app/</code>.</p>
+      </section>
+      <footer>Sources: <a href="https://github.com/236sec/habit-tracking/issues/1">spec #1</a>, native blocker links on GitHub issues, repository README, glossary, and ADRs.</footer>
+    </main>
+  </body>
+</html>

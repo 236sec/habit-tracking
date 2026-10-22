@@ -9,3 +9,15 @@ Run PostgreSQL, then start Axum and Next.js. Migrations run automatically at Axu
 ## Local acceptance
 
 `cd backend && cargo test` runs the HTTP authentication checks without Docker. The persistence test is explicitly ignored by default; run it against an existing test PostgreSQL database with `cd backend && TEST_DATABASE_URL=postgres://... cargo test --test account_access -- --ignored`. No frontend test runner or local provider service is required. The owner will test the configured Google and GitHub browser journeys manually. Run `make check` for format, lint, and type checks.
+
+## Manual provider verification for #2
+
+Record the result in [issue #2](https://github.com/236sec/habit-tracking/issues/2) before closing it. Record project references and Account UUIDs if useful; keep full email addresses, tokens, and secrets out of the issue.
+
+- [ ] Google-only and GitHub-only projects have the expected OAuth providers and allowed callback URLs.
+- [ ] The same verified email signs in through each provider and reaches Today at phone and desktop widths.
+- [ ] The two providers map to different Account UUIDs. After each sign-in, inspect the app database with `SELECT issuer, account_id FROM account_identities ORDER BY issuer;` and compare the two rows. Do not post subjects or tokens.
+- [ ] After sign-out and return through each provider, its Account UUID is unchanged.
+- [ ] Returning through either provider never changes that provider's Account UUID. Recheck data isolation when #4 adds user-owned Habits.
+
+Record the test date, project references, pass/fail for each item, and any error message in the issue. Keep #2 open and PR #21 in draft until this check passes.

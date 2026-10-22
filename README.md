@@ -30,7 +30,8 @@ The backend is derived from [236sec/rust-axum-boilerplate](https://github.com/23
 
 ## Source of truth
 
-- [Product spec](https://github.com/236sec/habit-tracking/issues/1) — agreed behavior, scope, and browser-level testing decisions.
+- [Product spec](https://github.com/236sec/habit-tracking/issues/1) — agreed behavior, scope, backend testing decisions, and manual browser acceptance.
+- [First issues plan](docs/first-issues-plan.html) — implementation sequence and current manual acceptance gates.
 - [Implementation tickets](https://github.com/236sec/habit-tracking/issues/1) — 17 sub-issues with native blocking links and the `ready-for-agent` label. [Ticket #2](https://github.com/236sec/habit-tracking/issues/2) is the first unblocked slice.
 - [Glossary](GLOSSARY.md) — canonical terms for Habit, Planned day, Morning routine, Task, Free plan, and Subscription.
 - [ADR 0001](docs/adr/0001-preserve-historical-planned-days.md) — schedule changes preserve historical Planned days.
@@ -39,6 +40,6 @@ The backend is derived from [236sec/rust-axum-boilerplate](https://github.com/23
 
 ## Continuing the work
 
-Start with the first unblocked ticket and follow the blockers recorded on each GitHub issue. Each ticket is a user-visible vertical slice, including its browser-level acceptance behavior. Keep the glossary and ADRs aligned with any new domain decisions.
+Start with the first unblocked ticket and follow the blockers recorded on each GitHub issue. Each ticket is a user-visible vertical slice, with backend automated checks and a manual browser acceptance journey. Keep the glossary and ADRs aligned with any new domain decisions.
 
 The exact monthly THB price and payment provider remain open launch decisions. The Subscription ticket calls for a configurable price and a verified sandbox checkout; public checkout needs a chosen amount before launch.
