@@ -6,6 +6,7 @@ pub async fn init_db(database_url: &str) -> anyhow::Result<PgPool> {
         .max_connections(5)
         .connect(database_url)
         .await?;
+    sqlx::migrate!("./migrations").run(&pool).await?;
 
     info!("connected to database");
     Ok(pool)

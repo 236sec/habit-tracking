@@ -5,6 +5,8 @@
 
 use crate::usecases::common::error::AppError;
 
+pub mod accounts;
+
 impl From<sqlx::Error> for AppError {
     fn from(value: sqlx::Error) -> Self {
         AppError::Database(value.to_string())

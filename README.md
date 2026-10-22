@@ -4,32 +4,34 @@ A planned, phone-first web application for individuals to keep good habits going
 
 ## Project status
 
-Planning is complete and the application scaffolds are in place. Product features, including Supabase sign-in, have not been implemented yet.
+The first slice provides Google and GitHub sign-in through Supabase Auth and a protected, empty Today screen. Habit, routine, Task, and Subscription features remain to be built. Live provider verification awaits configured test projects.
 
 ## Local development
 
-Requirements: Rust 1.97+, Node.js 20.9+, npm, Docker, and Make.
+Requirements: Rust 1.97+, Node.js 20.9+, npm, Make, and access to PostgreSQL. Docker is optional.
+
+Configure the two Supabase Auth projects and environment files as described in [social sign-in setup](docs/auth-setup.md).
 
 ```bash
 cd frontend && npm ci && npm run dev
 ```
 
-In another terminal, start the database and backend:
+In another terminal, configure a PostgreSQL connection and start the backend:
 
 ```bash
 cd backend
-docker compose up -d database
 cp .env.example .env
 cargo run
 ```
 
-The frontend runs at `http://localhost:3000` and the backend health endpoint is `http://localhost:8000/api/health`. Run `make check` at the repository root for Rust formatting/Clippy and frontend Prettier/ESLint/TypeScript checks. Run `make format` to apply formatting and `make test` for Rust tests. The tracked `.githooks/pre-commit` runs `make check`; activate it in a clone with `git config core.hooksPath .githooks` (already configured in this checkout). No GitHub Actions workflow is used.
+Set `DATABASE_URL` in `backend/.env` to your PostgreSQL connection before `cargo run`; migrations apply on startup. The frontend runs at `http://localhost:3000` and the backend health endpoint is `http://localhost:8000/api/health`. Run `make check` at the repository root for Rust formatting/Clippy and frontend Prettier/ESLint/TypeScript checks. Run `make format` to apply formatting and `make test` for Rust tests. The backend HTTP tests run without Docker; the PostgreSQL persistence test is opt-in as documented in [social sign-in setup](docs/auth-setup.md). The tracked `.githooks/pre-commit` runs `make check`; activate it in a clone with `git config core.hooksPath .githooks` (already configured in this checkout). No GitHub Actions workflow is used.
 
 The backend is derived from [236sec/rust-axum-boilerplate](https://github.com/236sec/rust-axum-boilerplate); see [backend/README.md](backend/README.md) for the source commit and changes.
 
 ## Source of truth
 
-- [Product spec](https://github.com/236sec/habit-tracking/issues/1) — agreed behavior, scope, and browser-level testing decisions.
+- [Product spec](https://github.com/236sec/habit-tracking/issues/1) — agreed behavior, scope, backend testing decisions, and manual browser acceptance.
+- [First issues plan](docs/first-issues-plan.html) — implementation sequence and current manual acceptance gates.
 - [Implementation tickets](https://github.com/236sec/habit-tracking/issues/1) — 17 sub-issues with native blocking links and the `ready-for-agent` label. [Ticket #2](https://github.com/236sec/habit-tracking/issues/2) is the first unblocked slice.
 - [Glossary](GLOSSARY.md) — canonical terms for Habit, Planned day, Morning routine, Task, Free plan, and Subscription.
 - [ADR 0001](docs/adr/0001-preserve-historical-planned-days.md) — schedule changes preserve historical Planned days.
@@ -38,6 +40,6 @@ The backend is derived from [236sec/rust-axum-boilerplate](https://github.com/23
 
 ## Continuing the work
 
-Start with the first unblocked ticket and follow the blockers recorded on each GitHub issue. Each ticket is a user-visible vertical slice, including its browser-level acceptance behavior. Keep the glossary and ADRs aligned with any new domain decisions.
+Start with the first unblocked ticket and follow the blockers recorded on each GitHub issue. Each ticket is a user-visible vertical slice, with backend automated checks and a manual browser acceptance journey. Keep the glossary and ADRs aligned with any new domain decisions.
 
 The exact monthly THB price and payment provider remain open launch decisions. The Subscription ticket calls for a configurable price and a verified sandbox checkout; public checkout needs a chosen amount before launch.
